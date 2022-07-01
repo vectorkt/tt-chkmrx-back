@@ -22,6 +22,7 @@ class Log {
         this.badFiles = null;
 
         this.scanCoverage = null;
+        this.scanCoverageLOC = null;
     }
 
     parseFileName(fileName) {
@@ -63,8 +64,12 @@ class Log {
                         this.badFiles = datum.split(/\t/)[1];
                     }
 
-                    if (datum.includes("Scan coverage")) {
+                    if (datum.includes("Scan coverage:")) {                        
                         this.scanCoverage = datum.split(/\t/)[1].replace('%','');;
+                    }
+
+                    if (datum.includes("Scan coverage LOC:")) {
+                        this.scanCoverageLOC = datum.split(/\t/)[1].replace('%','');;
                     }
                 }
             )

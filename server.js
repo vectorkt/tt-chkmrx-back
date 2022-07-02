@@ -90,29 +90,29 @@ const parsedLogs = parseLogs();
 const aggregatedLogs = aggregateLogs(parsedLogs);
 const latestLogs = summarizeLogs(aggregatedLogs);
 
-console.log(latestLogs);
+const projectTitles = Object.keys(aggregatedLogs)
 
-const projects = Object.keys(aggregatedLogs)
+app.post('/logs', authenticateToken,
+    (req, res) => {
 
-app.post('/logs', (req, res) => {
+        if (req.body.project == "all") {
+            res.json(parsedLogs)
+        }
+        else if (req.body.project && req.body.project in aggregatedLogs) {
+            res.json(aggregatedLogs[req.body.project]);
+        }
+        else {
+            res.json(latestLogs);
+        }
+    })
 
+app.post('/projecttitles', authenticateToken,
+    
+    (req, res) => {
+        console.log("projects called")
+        res.json(projectTitles);
 
-    if (req.body.project == "all") {
-        res.json(parsedLogs)
-    }
-    else if (req.body.project && req.body.project in aggregatedLogs) {
-        res.json(aggregatedLogs[req.body.project]);
-    }
-    else {
-        res.json(latestLogs);
-    }
-})
-
-app.post('/projects', (req, res) => {
-
-    res.json(projects);
-
-})
+    })
 
 
 
@@ -121,11 +121,12 @@ app.post('/login', (req, res) => {
     console.log(req.body)
     console.log(req.body.user)
 
-
-
     if (req.body.user) {
 
-        if (req.body.user.email == "admin" && req.body.user.password == "admin") {
+        const storedEmail = "admin";
+        const storedPassword = 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=';
+
+        if (req.body.user.email == storedEmail && req.body.user.password == storedPassword) {
             const accessToken = jwt.sign(req.body.user, process.env.ACCESS_TOKEN_SECRET);
             res.json({
                 success: true,

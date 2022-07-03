@@ -15,19 +15,23 @@ class Log {
         this.language = null;
         this.version = null;
 
+        this.scanCoverage = null;
+        this.scanCoverageLOC = null;
+
         this.totalFiles = null;
         this.goodFiles = null;
 
         this.partiallyGoodFiles = null;
         this.badFiles = null;
 
-        this.scanCoverage = null;
-        this.scanCoverageLOC = null;
+        this.logName = null;
     }
 
     parseFileName(fileName) {
 
         const [project, language, version] = fileName.split("_");
+
+        this.logName = fileName;
 
         this.project = project;
         this.language = language;
@@ -48,6 +52,14 @@ class Log {
             dataStrings.map(
                 datum => {
 
+                    if (datum.includes("Scan coverage:")) {
+                        this.scanCoverage = datum.split(/\t/)[1].replace('%', '');;
+                    }
+
+                    if (datum.includes("Scan coverage LOC:")) {
+                        this.scanCoverageLOC = datum.split(/\t/)[1].replace('%', '');;
+                    }
+
                     if (datum.includes("Total files")) {
                         this.totalFiles = datum.split(/\t/)[1];
                     }
@@ -64,13 +76,7 @@ class Log {
                         this.badFiles = datum.split(/\t/)[1];
                     }
 
-                    if (datum.includes("Scan coverage:")) {                        
-                        this.scanCoverage = datum.split(/\t/)[1].replace('%','');;
-                    }
 
-                    if (datum.includes("Scan coverage LOC:")) {
-                        this.scanCoverageLOC = datum.split(/\t/)[1].replace('%','');;
-                    }
                 }
             )
 

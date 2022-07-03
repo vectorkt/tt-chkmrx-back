@@ -97,9 +97,7 @@ class Log {
 
 }
 
-const serveLogs = (results) => {
-    
-}
+
 
 const parseLogs = (filesToIgnore) => {
     try {
@@ -107,8 +105,7 @@ const parseLogs = (filesToIgnore) => {
         const fs = require('fs');
 
         var fileNames = fs.readdirSync(logsFolder);
-        fileNames = fileNames.filter(file => !filesToIgnore.includes(file))
-        //console.log(fileNames)
+        fileNames = fileNames.filter(file => !filesToIgnore.includes(file));        
 
         const parsedLogs = fileNames.map(file => {
             const data = fs.readFileSync(`${logsFolder}/${file}`, 'utf8');
@@ -173,10 +170,5 @@ const summarizeLogs = (aggregatedLogs) => {
 
 
 
-// exports.parseLogs = parseLogs;
-// exports.aggregateLogs = aggregateLogs;
-// exports.summarizeLogs = summarizeLogs;
-// exports.serveLogs = serveLogs;
-// exports.Log = Log;
 
-module.exports = { Log, parseLogs, aggregateLogs, summarizeLogs, serveLogs, }
+module.exports = {  parseLogs, aggregateLogs, summarizeLogs, }

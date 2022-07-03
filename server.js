@@ -53,13 +53,13 @@ const fetchLogsInDB = async () => {
 }
 
 
-const updateLogsInDB = async (logsInDB) => {
+const updateLogsInDBfromFiles = async (logsInDB) => {
 
     const filesToIgnore = logsInDB.map(log => log.fileName);
     const newParsedLogs = parseLogs(filesToIgnore);
 
-    console.log("newParsedLogs")
-    console.log(newParsedLogs)
+    // console.log("newParsedLogs")
+    // console.log(newParsedLogs)
 
     if (newParsedLogs) {
 
@@ -85,7 +85,7 @@ async function main() {
 
     var logsInDB = await fetchLogsInDB();
 
-    logsInDB = await updateLogsInDB(logsInDB);
+    logsInDB = await updateLogsInDBfromFiles(logsInDB);
 
     const aggregatedLogs = aggregateLogs(logsInDB);
     const latestLogs = summarizeLogs(aggregatedLogs);
@@ -128,6 +128,7 @@ async function main() {
 
         // console.log(req.body)
         // console.log(req.body.user)
+        // console.log(req.body.password)
 
         if (req.body.user) {
 

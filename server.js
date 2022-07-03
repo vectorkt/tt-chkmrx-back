@@ -7,10 +7,8 @@ const jwt = require('jsonwebtoken');
 app.use(express.json())
 const mongoose = require('mongoose');
 const DBLog = require('./models/DBLog')
-
-
 const { restart } = require('nodemon');
-const { parseLogs, aggregateLogs, summarizeLogs, Log, serveLogs } = require('./logTools/logTools');
+const { parseLogs, aggregateLogs, summarizeLogs } = require('./logTools/logTools');
 
 
 var corsOptions = {
@@ -47,11 +45,34 @@ function authenticateToken(req, res, next) {
 }
 
 
-const fetchLogs = async () => {
-    console.log("FETHCING")
+const fetchLogsInDB = async () => {
+
     const results = await DBLog.find()
     return results.map(result => JSON.parse(JSON.stringify(result)));
 
+}
+
+
+const updateLogsInDB = async (logsInDB) => {
+
+    const filesToIgnore = logsInDB.map(log => log.fileName);
+    const newParsedLogs = parseLogs(filesToIgnore);
+
+    console.log("newParsedLogs")
+    console.log(newParsedLogs)
+
+    if (newParsedLogs) {
+
+        newParsedLogs.forEach((parsedLog) => {
+            const servedLog = new DBLog({ ...parsedLog });
+            servedLog.save();
+        })
+
+        return await fetchLogsInDB();
+    }
+    else {
+        return logsInDB;
+    }
 }
 
 
@@ -62,116 +83,28 @@ async function main() {
     await mongoose.connect(dbURI)
 
 
+    var logsInDB = await fetchLogsInDB();
 
-
-    /*
-    app.get('/test', (req, res) => {
-        res.json('Kyle')
-    })
-
-    const data = [
-        {
-            username: 'Kyle',
-            title: 'Post 1'
-        },
-        {
-            username: 'Jim',
-            title: 'Post 2'
-        },
-    ]
-
-    app.get('/tests', (req, res) => {
-        res.json(data)
-    })
-
-    app.post('/testtokengeneration',
-        (req, res) => {
-
-            const username = req.body.username;
-            console.log(username)
-            const user = { name: username }
-
-            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-            res.json({ accessToken: accessToken })
-        })
-
-    app.post('/testtoken', authenticateToken,
-        (req, res) => {
-            console.log(req.user)
-            res.json('token verified')
-        })
-    /* */
-
-
-    //require('crypto').randomBytes(64).toString('hex')
-
-
-
-
-
-
-    //KITTENS
-    // const mycat = new Kitten({ name: 'Silence' });
-    // mycat.save()
-
-    // const results = await Kitten.find()
-    // console.log(results)
-
-    //{...parsedLogs[0]}
-
-
-    //SERVERLOGS
-
-    // parsedLogs.forEach((parsedLog) => {
-    //     const servedLog = new DBLog({ ...parsedLog });
-    //     servedLog.save();
-    // })
-
-    var logsInDB = await fetchLogs();
-    console.log("FETHCED")
-
-    const alreadyParsedFiles = logsInDB.map(log => log.fileName)
-    
-    console.log(logsInDB[0])
-    console.log(alreadyParsedFiles)
-    
-    const newParsedLogs = parseLogs(alreadyParsedFiles);
-    console.log("HERE")
-
-
-    console.log("parsedLogs")
-    console.log(newParsedLogs)
-
-    if (newParsedLogs) {
-        newParsedLogs.forEach((parsedLog) => {
-            const servedLog = new DBLog({ ...parsedLog });
-            servedLog.save();
-        })
-        logsInDB = await fetchLogs();
-    }
-    
-
-    //
-    //var returned = JSON.parse(JSON.stringify(results[0]));
-    //console.log(returned);
-    //console.log(returned._id);
-    //const { updatedAt, ...newObject } = results[0];
-    //console.log(newObject);
-
-
-
-
+    logsInDB = await updateLogsInDB(logsInDB);
 
     const aggregatedLogs = aggregateLogs(logsInDB);
     const latestLogs = summarizeLogs(aggregatedLogs);
+    const projectTitles = Object.keys(aggregatedLogs);
 
-    const projectTitles = Object.keys(aggregatedLogs)
+    // const second = 1000;
+    // const minute = 60 * second;
+    // const hour = 60 * minute
+    // setInterval(() => { console.log("interval") }, second);
+
+
+
+
 
     app.post('/logs', authenticateToken,
         (req, res) => {
 
             if (req.body.project == "all") {
-                res.json(parsedLogs)
+                res.json(logsInDB)
             }
             else if (req.body.project && req.body.project in aggregatedLogs) {
                 res.json(aggregatedLogs[req.body.project]);

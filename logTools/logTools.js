@@ -101,13 +101,13 @@ const serveLogs = (results) => {
     
 }
 
-const parseLogs = (alreadyParsedFiles) => {
+const parseLogs = (filesToIgnore) => {
     try {
         const logsFolder = './Logs/';
         const fs = require('fs');
 
         var fileNames = fs.readdirSync(logsFolder);
-        fileNames = fileNames.filter(file => !alreadyParsedFiles.includes(file))
+        fileNames = fileNames.filter(file => !filesToIgnore.includes(file))
         //console.log(fileNames)
 
         const parsedLogs = fileNames.map(file => {

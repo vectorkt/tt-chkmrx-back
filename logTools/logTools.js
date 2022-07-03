@@ -1,13 +1,19 @@
 //READING FILES
 class Log {
-    constructor(fileName, dataString) {
+
+    constructor(fileName = null, dataString = null) {
 
         var self = this;
 
         self.initialize();
-        self.parseFileName(fileName);
-        self.parseData(dataString);
 
+        if (fileName) {
+            self.parseFileName(fileName);
+        }
+
+        if (dataString) {
+            self.parseData(dataString);
+        }
     }
 
     initialize() {
@@ -24,14 +30,14 @@ class Log {
         this.partiallyGoodFiles = null;
         this.badFiles = null;
 
-        this.logName = null;
+        this.fileName = null;
     }
 
     parseFileName(fileName) {
 
         const [project, language, version] = fileName.split("_");
 
-        this.logName = fileName;
+        this.fileName = fileName;
 
         this.project = project;
         this.language = language;
@@ -91,12 +97,17 @@ class Log {
 
 }
 
-const parseLogs = () => {
+const serveLogs = (results) => {
+    
+}
+
+const parseLogs = (alreadyParsedFiles) => {
     try {
         const logsFolder = './Logs/';
         const fs = require('fs');
 
-        const fileNames = fs.readdirSync(logsFolder);
+        var fileNames = fs.readdirSync(logsFolder);
+        fileNames = fileNames.filter(file => !alreadyParsedFiles.includes(file))
         //console.log(fileNames)
 
         const parsedLogs = fileNames.map(file => {
@@ -162,7 +173,10 @@ const summarizeLogs = (aggregatedLogs) => {
 
 
 
-exports.parseLogs = parseLogs;
-exports.aggregateLogs = aggregateLogs;
-exports.summarizeLogs = summarizeLogs;
-exports.Log = Log;
+// exports.parseLogs = parseLogs;
+// exports.aggregateLogs = aggregateLogs;
+// exports.summarizeLogs = summarizeLogs;
+// exports.serveLogs = serveLogs;
+// exports.Log = Log;
+
+module.exports = { Log, parseLogs, aggregateLogs, summarizeLogs, serveLogs, }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ServerLogSchema = new Schema(
+const DBLogSchema = new Schema(
     {
         project: {
             type: String,
@@ -49,7 +49,7 @@ const ServerLogSchema = new Schema(
             required: true
         },
 
-        logName: {
+        fileName: {
             type: String,
             required: true
         },
@@ -59,4 +59,4 @@ const ServerLogSchema = new Schema(
 )
 
 
-module.exports = mongoose.model('ServerLog', ServerLogSchema);
+module.exports = mongoose.model('DBLog', DBLogSchema);

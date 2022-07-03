@@ -6,12 +6,11 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken');
 app.use(express.json())
 const mongoose = require('mongoose');
-const ServerLog = require('./models/ServerLog')
-const Kitten = require('./models/Kitten')
+const DBLog = require('./models/DBLog')
 
 
 const { restart } = require('nodemon');
-const { parseLogs, aggregateLogs, summarizeLogs } = require('./logTools/logTools');
+const { parseLogs, aggregateLogs, summarizeLogs, Log, serveLogs } = require('./logTools/logTools');
 
 
 var corsOptions = {
@@ -48,6 +47,13 @@ function authenticateToken(req, res, next) {
 }
 
 
+const fetchLogs = async () => {
+    console.log("FETHCING")
+    const results = await DBLog.find()
+    return results.map(result => JSON.parse(JSON.stringify(result)));
+
+}
+
 
 
 async function main() {
@@ -56,8 +62,7 @@ async function main() {
     await mongoose.connect(dbURI)
 
 
-    app.listen(4000)
-    console.log("listening")
+
 
     /*
     app.get('/test', (req, res) => {
@@ -103,7 +108,7 @@ async function main() {
 
 
 
-    const parsedLogs = parseLogs();
+
 
     //KITTENS
     // const mycat = new Kitten({ name: 'Silence' });
@@ -116,20 +121,48 @@ async function main() {
 
 
     //SERVERLOGS
-    //const servedLog = new ServerLog({...parsedLogs[0]});
-    //console.log(servedLog);
-    //servedLog.save()
 
-    //const results = await ServerLog.find()
-    //console.log(results)
+    // parsedLogs.forEach((parsedLog) => {
+    //     const servedLog = new DBLog({ ...parsedLog });
+    //     servedLog.save();
+    // })
 
-    parsedLogs.forEach((parsedLog) => {
-        const servedLog = new ServerLog({ ...parsedLog });
-        servedLog.save();
-    })
+    var logsInDB = await fetchLogs();
+    console.log("FETHCED")
+
+    const alreadyParsedFiles = logsInDB.map(log => log.fileName)
+    
+    console.log(logsInDB[0])
+    console.log(alreadyParsedFiles)
+    
+    const newParsedLogs = parseLogs(alreadyParsedFiles);
+    console.log("HERE")
 
 
-    const aggregatedLogs = aggregateLogs(parsedLogs);
+    console.log("parsedLogs")
+    console.log(newParsedLogs)
+
+    if (newParsedLogs) {
+        newParsedLogs.forEach((parsedLog) => {
+            const servedLog = new DBLog({ ...parsedLog });
+            servedLog.save();
+        })
+        logsInDB = await fetchLogs();
+    }
+    
+
+    //
+    //var returned = JSON.parse(JSON.stringify(results[0]));
+    //console.log(returned);
+    //console.log(returned._id);
+    //const { updatedAt, ...newObject } = results[0];
+    //console.log(newObject);
+
+
+
+
+
+    const aggregatedLogs = aggregateLogs(logsInDB);
     const latestLogs = summarizeLogs(aggregatedLogs);
 
     const projectTitles = Object.keys(aggregatedLogs)
@@ -195,7 +228,8 @@ async function main() {
 
     })
 
-
+    app.listen(4000)
+    console.log("listening")
 
 }
 

@@ -19,6 +19,10 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
+/**
+ * Authentication function for jwt.
+ * Contains a parser for the data retrieved from the logs.
+ */
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]
@@ -42,7 +46,9 @@ const authenticateToken = (req, res, next) => {
         })
 }
 
-
+/**
+ * Function to fetch the logs from the database.
+ */
 const fetchLogsInDB = async () => {
 
     const results = await DBLog.find()
@@ -50,7 +56,10 @@ const fetchLogsInDB = async () => {
 
 }
 
-
+/**
+ * Function which parses new log files and updates the database.
+ * It then returns the logs.
+ */
 const updateLogsInDBfromFiles = async () => {
 
     var logsInDB = await fetchLogsInDB()

@@ -1,4 +1,9 @@
-//READING FILES
+/**
+ * Log object for easier manipulation.
+ * Contains a parser for the data retrieved from the logs.
+ * @param fileName String, file name to be parsed and stored.
+ * @param dataString String, string of data from inside the file.
+ */
 class Log {
 
     constructor(fileName = null, dataString = null) {
@@ -98,14 +103,17 @@ class Log {
 }
 
 
-
+/**
+ * Function for parsing logs from log files and return a list of Log objects.
+ * @param filesToIgnore List<String>, the list of files to ignore when parsing.
+ */
 const parseLogs = (filesToIgnore) => {
     try {
         const logsFolder = './Logs/';
         const fs = require('fs');
 
         var fileNames = fs.readdirSync(logsFolder);
-        fileNames = fileNames.filter(file => !filesToIgnore.includes(file));        
+        fileNames = fileNames.filter(file => !filesToIgnore.includes(file));
 
         const parsedLogs = fileNames.map(file => {
             const data = fs.readFileSync(`${logsFolder}/${file}`, 'utf8');
@@ -121,7 +129,10 @@ const parseLogs = (filesToIgnore) => {
 
 }
 
-
+/**
+ * Function taking a list of log objects and creating a dictionary based on the project name
+ * @param parsedLogs List<Log>, the list of logs to aggregate.
+ */
 const aggregateLogs = (parsedLogs) => {
     try {
 
@@ -154,7 +165,10 @@ const aggregateLogs = (parsedLogs) => {
     }
 }
 
-
+/**
+ * Function taking a dicitonary of log lits and return the most relevant
+ * @param parsedLogs Dict<List<Log>>, the list of logs to aggregate.
+ */
 const summarizeLogs = (aggregatedLogs) => {
 
     var summarizedLogs = [];
@@ -171,4 +185,4 @@ const summarizeLogs = (aggregatedLogs) => {
 
 
 
-module.exports = {  parseLogs, aggregateLogs, summarizeLogs, }
+module.exports = { parseLogs, aggregateLogs, summarizeLogs, }

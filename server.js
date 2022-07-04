@@ -90,7 +90,7 @@ async function main() {
     const projectTitles = Object.keys(aggregatedLogs);
 
 
-    //UPDATE EVERY 24 HOURS
+    //UPDATE SERVER AND DB FROM LOGS EVERY 24 HOURS 
     setInterval(async () => {
 
         logsInDB = await updateLogsInDBfromFiles(logsInDB);
